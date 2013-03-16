@@ -177,7 +177,7 @@ def processOutputs(targets, keys):
     return targets, status
  
 def displayMode(mode):
-    text = font.render(mode, False, (255, 0, 255), (0, 0, 0))
+    text = font.render(mode, True, (255, 0, 255), None)
     textRect = text.get_rect()
     #print textRect
     textRect.centerx = 20 #screen.get_rect().centerx
