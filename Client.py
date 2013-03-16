@@ -29,39 +29,6 @@ pygame.display.set_caption('Driver')
 ubuntu = pygame.font.match_font('Ubuntu')
 font = pygame.font.Font(ubuntu, 13)
 
-'''#def getTrainingSet():
-    #targets = []
-    #inputs = []
-    #win=curses.initscr()
-    while True:
-          inputX = getImage()
-          inputX = processImages(inputX, inputs)
-          #result = win.getkey()
-          #targets = processKeyPress(result, targets)
-          #inputs = processImages(inputX, inputs)
-          #if targets[-1] == 0:
-             #break
-    #curses.endwin()
-    sio.savemat('inputs.mat', {'inputs':inputs})
-    targets = np.array(targets)
-    sio.savemat('targets.mat', {'targets':targets}) '''
-
-
-#def Driver():
-    #status = False
-    #p = Process(target=getKeyPress, args=())
-    #p2 = Process(target=getImage, args=())
-    #p.start()
-    #p2.start()
-    #targets = p.get()
-    #inputs = p2.get()
-    #p.join()
-    #p2.join()
-    #targets = np.array(targets)
-    #targets = flattenMatrix(targets)
-    #sio.savemat('inputs.mat', {'inputs':inputs})
-    #sio.savemat('targets.mat', {'targets':targets})
-
 
 
 def getKeyPress():
