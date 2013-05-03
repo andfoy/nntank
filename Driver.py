@@ -176,9 +176,8 @@ def processOutputs(keys, targets):
              send_command('p')
     return targets, status
 
-if not Automatic:
-   gkp = getKeyPress()
-   gkp.start()
+gkp = getKeyPress()
+gkp.start()
 
 if __name__ == '__main__':
    inputs = []
