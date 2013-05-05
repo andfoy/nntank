@@ -8,13 +8,14 @@ import threading
 import numpy as np
 import scipy
 import scipy.io as sio
+import cv2
 import matplotlib.image as mpimg
 from pygame.locals import *
 
-debug = sys.argv[1]
+debug = False
 
 if not debug:
-   PORT = '/dev/rfcomm1'
+   PORT = '/dev/rfcomm0'
    SPEED = 115200
 
    ser = serial.Serial(PORT)
@@ -84,6 +85,30 @@ class getKeyPress(threading.Thread):
            print "Saving Labels..."
            sio.savemat('targets.mat', {'targets':targets})  
            print "Labels saved!"  
+
+def getThreshold(img):
+    scale = 1
+    delta = 0
+    ddepth = cv2.CV_16S
+
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    grad_x = cv2.Sobel(gray,ddepth,1,0,ksize = 3, scale = scale, delta = delta,borderType = cv2.BORDER_DEFAULT)
+    grad_y = cv2.Sobel(gray,ddepth,0,1,ksize = 3, scale = scale, delta = delta, borderType = cv2.BORDER_DEFAULT)
+
+
+    abs_grad_x = cv2.convertScaleAbs(grad_x) # converting back to uint8
+    abs_grad_y = cv2.convertScaleAbs(grad_y)
+
+    dst = cv2.addWeighted(abs_grad_x,0.5,abs_grad_y,0.5,0)
+
+    ret,thresh = cv2.threshold(dst,127,255,0)
+    contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
+    for i in range(0, len(contours)):
+        contours[i] = cv2.approxPolyDP(contours[i],0.03*cv2.arcLength(contours[i],True),True)
+ 
+    cv2.drawContours(img,contours,-1,(0,255,0), 2)  
+    return img
 
 
 def rgb2gray(rgb):
@@ -160,9 +185,9 @@ def processOutputs(keys, targets):
        for i, j, k, g in zip(keypress, labels, commands, text):
            if keys[i]:
               move = g
-              label.append(j)
-              if not Automatic:  
-                 if not debug:  
+              label.append(j) 
+              if not Automatic:
+                 if not debug:   
                     send_command(k)
     if len(label) != 0:
        if Record:
@@ -171,14 +196,14 @@ def processOutputs(keys, targets):
        else:
           pass
     else:
-       if not Automatic:
-          if not debug:
-             send_command('p')
+       if not debug:
+          send_command('p')
+       move = " "
     return targets, status
 
-if not Automatic:
-   gkp = getKeyPress()
-   gkp.start()
+
+gkp = getKeyPress()
+gkp.start()
 
 if __name__ == '__main__':
    inputs = []
@@ -187,6 +212,7 @@ if __name__ == '__main__':
            urllib.urlretrieve("http://192.168.0.10:8080/shot.jpg", "input.jpg")
            try:
              inputX = mpimg.imread('input.jpg')
+             inputX = getThreshold(inputX)
            except IOError:
              status = True
            inputX = rgb2gray(inputX)/255
@@ -217,8 +243,8 @@ if __name__ == '__main__':
               pygame.display.update()
            text = font.render(mode, False, (0, 255, 0))
            textRect = text.get_rect()
-           textRect.centerx = 20 #screen.get_rect().centerx
-           textRect.centery = 70 #screen.get_rect().centery
+           textRect.centerx = 270 #screen.get_rect().centerx
+           textRect.centery = 20 #screen.get_rect().centery
            screen.blit(text, textRect)
            pygame.display.update()           
            if status:
