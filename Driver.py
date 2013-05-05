@@ -201,7 +201,10 @@ def processOutputs(keys, targets):
        move = " "
     return targets, status
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 36c4232dcc31b1055fcd82ca609bbbd51a36f61d
 gkp = getKeyPress()
 gkp.start()
 
